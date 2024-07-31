@@ -56,19 +56,12 @@
     </div>
 
     <script>
-        // const API_ENDPOINT = 'https://combanketh.et/cbeapi/daily-exchange-rates/?_limit=1&Date='; 
         const API_ENDPOINT = 'https://combanketh.et/cbeapi/daily-exchange-rates?_limit=1&_sort=Date%3ADESC';
 
-        function formatDate(date) {
-            return date.toISOString().split('T')[0];
-        }
-
         async function fetchExchangeRates() {
-            const today = new Date();
-            const formattedDate = formatDate(today);
             try {
-                const response = await axios.get(API_ENDPOINT + formattedDate);
-                const data = response.data[0];
+                const response = await axios.get(API_ENDPOINT);
+                const data = response.data[0]; // Ensure this accesses the correct data structure
                 
                 if (data && data.ExchangeRate) {
                     const ratesHTML = data.ExchangeRate.map(rate => `
@@ -91,10 +84,6 @@
                 document.getElementById('exchangeRates').innerHTML = '<p>Error fetching exchange rates. Please try again later.</p>';
             }
         }
-
-        // Fetch exchange rates immediately and then every 3 hours
-        fetchExchangeRates();
-        setInterval(fetchExchangeRates, 3 * 60 * 60 * 1000);
     </script>
 </body>
 </html>
