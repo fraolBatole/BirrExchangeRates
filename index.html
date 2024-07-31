@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ethiopian Birr Exchange Rate Tracker</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        #exchangeRates {
+            margin-top: 20px;
+        }
+        .rate {
+            background: #f9f9f9;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        .rate h2 {
+            margin-top: 0;
+            color: #444;
+        }
+        .rate p {
+            margin: 5px 0;
+        }
+        #lastUpdated {
+            text-align: center;
+            margin-top: 20px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Ethiopian Birr Exchange Rate Tracker</h1>
+        <div id="exchangeRates"></div>
+        <p id="lastUpdated"></p>
+    </div>
+
+    <script>
+        const API_ENDPOINT = 'https://combanketh.et/cbeapi/daily-exchange-rates/?_limit=1&Date=';
+
+        function formatDate(date) {
+            return date.toISOString().split('T')[0];
+        }
+
+        async function fetchExchangeRates() {
+            const today = new Date();
+            const formattedDate = formatDate(today);
+            try {
+                const response = await axios.get(API_ENDPOINT + formattedDate);
+                const data = response.data[0];
+                
+                if (data && data.ExchangeRate) {
+                    const ratesHTML = data.ExchangeRate.map(rate => `
+                        <div class="rate">
+                            <h2>${rate.currency.CurrencyName} (${rate.currency.CurrencyCode})</h2>
+                            <p>Cash Buying: ${rate.cashBuying}</p>
+                            <p>Cash Selling: ${rate.cashSelling}</p>
+                            <p>Transactional Buying: ${rate.transactionalBuying}</p>
+                            <p>Transactional Selling: ${rate.transactionalSelling}</p>
+                        </div>
+                    `).join('');
+
+                    document.getElementById('exchangeRates').innerHTML = ratesHTML;
+                    document.getElementById('lastUpdated').textContent = `Last updated: ${new Date().toLocaleString()}`;
+                } else {
+                    document.getElementById('exchangeRates').innerHTML = '<p>No exchange rate data available for today.</p>';
+                }
+            } catch (error) {
+                console.error('Error fetching exchange rates:', error);
+                document.getElementById('exchangeRates').innerHTML = '<p>Error fetching exchange rates. Please try again later.</p>';
+            }
+        }
+
+        // Fetch exchange rates immediately and then every 3 hours
+        fetchExchangeRates();
+        setInterval(fetchExchangeRates, 3 * 60 * 60 * 1000);
+    </script>
+</body>
+</html>
