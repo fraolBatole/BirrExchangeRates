@@ -56,7 +56,8 @@
     </div>
 
     <script>
-        const API_ENDPOINT = 'https://combanketh.et/cbeapi/daily-exchange-rates/?_limit=1&Date=';
+        // const API_ENDPOINT = 'https://combanketh.et/cbeapi/daily-exchange-rates/?_limit=1&Date='; 
+        const API_ENDPOINT = 'https://combanketh.et/cbeapi/daily-exchange-rates?_limit=1&_sort=Date%3ADESC';
 
         function formatDate(date) {
             return date.toISOString().split('T')[0];
